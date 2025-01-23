@@ -9,7 +9,7 @@ using namespace esphome;
 #define SB1_HEADER_LEN   2     // Length of fixed header
 #define HOOK_STALL_TIME  50    // Time to delay in shutdown hook before actually sleeping
 #define RESET_ACK_DELAY  250   // Time to wait before rebooting due to reset
-#define EVENT_ACK_DELAY  250   // Time to wait before acking motion event and getting put to sleep
+#define EVENT_ACK_DELAY  10    // Time to wait before acking motion event and getting put to sleep
 #define ACK_WAIT_TIMEOUT 1000  // Time to wait for handshake response before re-sending request
 #define HALT_SLEEP_DELAY 1000 * 1000 * 120 // Time to deepsleep when waiting to get put to sleep by the SB1
 #define NORM_MAX_UPTIME  1000  // Time to ttay in RUNNING_NORMAL waiting for an event before sleeping
@@ -177,7 +177,7 @@ class SB1UARTComponent : public Component, public uart::UARTDevice {
       return (this->message_.type == type && this->message_.length >= length);
     }
 
-    /* 
+    /*
      * Update state machine
      */
     void set_state(SB1State state) {
@@ -227,7 +227,7 @@ class SB1UARTComponent : public Component, public uart::UARTDevice {
 
     void setup() override {
       ESP_LOGCONFIG(TAG, "Setting up SB1 UART...");
-      this->rtc_ = global_preferences.make_preference<bool>(this->sensor_->get_object_id_hash());
+      this->rtc_ = global_preferences->make_preference<bool>(this->sensor_->get_object_id_hash());
       this->rtc_.load(&this->ota_mode_);
 
       if (!this->ota_mode_) {
@@ -244,7 +244,7 @@ class SB1UARTComponent : public Component, public uart::UARTDevice {
       ESP_LOGCONFIG(TAG, "  Product Info: %s", this->product_info_);
     }
 
-    /* 
+    /*
      * State machine; generally follows the same message sequence as
      * has been observed to flow between the stock Tuya firmware and
      * the SB1 chip via the UART bus.
@@ -277,7 +277,7 @@ class SB1UARTComponent : public Component, public uart::UARTDevice {
               } else {
                 set_state(SB1_STATE_CONF_STA);
               }
-            } else { 
+            } else {
               set_state(SB1_STATE_BOOT_WIFI);
             }
           } else if (state_duration() > ACK_WAIT_TIMEOUT) {
@@ -304,7 +304,7 @@ class SB1UARTComponent : public Component, public uart::UARTDevice {
           }
           break;
         case SB1_STATE_BOOT_DHCP:
-          if (wifi::global_wifi_component->get_ip_address() != (uint32_t)0 ) {
+          if (wifi::global_wifi_component->get_ip_addresses()[0].is_set() ) {
             write_message(SB1_MESSAGE_TYPE_STATUS, SB1_STATUS_BOOT_DHCP, 1);
             set_state(SB1_STATE_BOOT_DHCP_ACK);
           }
@@ -368,6 +368,8 @@ class SB1UARTComponent : public Component, public uart::UARTDevice {
               } else if (event_type == SB1_EVENT_TYPE_MOTION_RESET ||
                          event_type == SB1_EVENT_TYPE_DOOR_RESET) {
                 ESP_LOGI(TAG, "Reset event: %d", this->message_.value[i + 4]);
+                write_message(SB1_MESSAGE_TYPE_EVENT, SB1_EVENT_ACK, 1);
+                return;
               }
             }
             set_state(SB1_STATE_EVENT_ACK);

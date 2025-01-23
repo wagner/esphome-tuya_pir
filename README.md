@@ -7,7 +7,7 @@ Overview
 --------
 
 These devices embed an ESP8266 wifi processor paired with a low-power MCU. The MCU controls the LEDs, sends sensor events, and gates power to the ESP8266 when it is not needed. The MCU and ESP8266 communicate via serial UART at 9600 bps.
- 
+
  These devices have been discussed a few places:
 * https://github.com/esphome/esphome/issues/306
 * https://community.home-assistant.io/t/coolcam-wifi-motion-sensor-pir/54783
@@ -85,7 +85,7 @@ struct DataPoint {
   uint16_t length;
   uint8_t value[];   // Variable length
 }
-``` 
+```
 
 Handshake
 ---------
