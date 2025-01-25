@@ -9,7 +9,7 @@ using namespace esphome;
 #define SB1_HEADER_LEN   2     // Length of fixed header
 #define HOOK_STALL_TIME  50    // Time to delay in shutdown hook before actually sleeping
 #define RESET_ACK_DELAY  250   // Time to wait before rebooting due to reset
-#define EVENT_ACK_DELAY  10    // Time to wait before acking motion event and getting put to sleep
+#define EVENT_ACK_DELAY  250   // Time to wait before acking motion event and getting put to sleep
 #define ACK_WAIT_TIMEOUT 1000  // Time to wait for handshake response before re-sending request
 #define HALT_SLEEP_DELAY 1000 * 1000 * 120 // Time to deepsleep when waiting to get put to sleep by the SB1
 #define NORM_MAX_UPTIME  1000  // Time to ttay in RUNNING_NORMAL waiting for an event before sleeping

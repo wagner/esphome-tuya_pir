@@ -16,6 +16,10 @@ wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
   fast_connect: true
+  manual_ip:
+    static_ip: 192.168.68.129
+    subnet: 255.255.255.0
+    gateway: 192.168.68.1
 
 mqtt:
   broker: !secret mqtt_broker
@@ -24,8 +28,6 @@ mqtt:
   birth_message:
   shutdown_message:
   will_message:
-  discover_ip: true
-  discovery: true
 
 uart:
   - tx_pin: 1
@@ -38,7 +40,7 @@ ota:
     password: !secret ota_password
 
 logger:
-  level: INFO
+  level: DEBUG
   hardware_uart: UART1
 
 sensor:
